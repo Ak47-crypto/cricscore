@@ -1,6 +1,6 @@
 import mongoose,{Schema,Document} from 'mongoose';
 
-interface IPlayer extends Document{
+export interface IPlayer extends Document{
     name:string;
     team:Schema.Types.ObjectId;
 }
@@ -16,4 +16,4 @@ const PlayerSchema:Schema<IPlayer> = new Schema({
     }
 },{timestamps:true})
 
-export default mongoose.model<IPlayer>('Player',PlayerSchema)
+export default mongoose.model<IPlayer>('PlayerModel',PlayerSchema)
