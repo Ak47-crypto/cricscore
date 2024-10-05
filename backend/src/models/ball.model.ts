@@ -1,7 +1,6 @@
 import mongoose,{Schema,Document} from "mongoose";
 
-interface IBall extends Document{
-    ballNo:number;
+export interface IBall extends Document{
     runs:number;
     extras:{
         wide: boolean;
@@ -17,10 +16,6 @@ interface IBall extends Document{
     match:Schema.Types.ObjectId;
 }
 const BallSchema:Schema<IBall> = new Schema({
-    ballNo:{
-        type:Number,
-        required:true
-    },
     runs:{
         type:Number,
         default:0
@@ -57,19 +52,19 @@ const BallSchema:Schema<IBall> = new Schema({
     },
     batsman:{
         type:Schema.Types.ObjectId,
-        ref:'Player',
+        ref:'PlayerModel',
         required:true
     },
     bowler:{
         type:Schema.Types.ObjectId,
-        ref:'Player',
+        ref:'PlayerModel',
         required:true
     },
     match:{
         type:Schema.Types.ObjectId,
-        ref:'Match',
+        ref:'MatchModel',
         required:true
     }
 },{timestamps:true})
 
-export default mongoose.model<IBall>('Ball',BallSchema);
+export default mongoose.model<IBall>('BallModel',BallSchema);

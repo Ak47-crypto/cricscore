@@ -1,20 +1,22 @@
 import { asyncHandler } from "../utils/asyncHandler";
 import { Request, Response, NextFunction } from "express";
-import MatchModel from "../models/match.model";
+import MatchModel, { IMatch } from "../models/match.model";
 import { apiError } from "../utils/apiError";
 import { apiResponse } from "../utils/apiResponse";
-import { IDataMatch } from "../types/dataType";
+import { IDataBall, IDataMatch } from "../types/dataType";
 import TeamModel, { ITeam } from "../models/team.model";
 import PlayerModel, { IPlayer } from "../models/player.model";
 import mongoose from "mongoose";
+import BallModel, { IBall } from "../models/ball.model";
+import updateMatchDetails from "../helpers/updateMatchDetails";
 
 const handleMatchCreation = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const { data }: { data: IDataMatch } = req.body;
+    const { data }: { data: IMatch } = req.body;
     console.log(data);
     if (data) {
       const matchDetails = new MatchModel({
-        name: data.matchName,
+        name: data.name,
         team: data.team,
         innings: data.innings,
         date: data.date,
@@ -55,9 +57,9 @@ const handlePlayerCreation = asyncHandler(
     if (!mongoose.Types.ObjectId.isValid(data.team.toString())) {
       throw new apiError(400, "Invalid team ID");
     }
-    const isTeamExist = await TeamModel.findById(data.team)
-    if(!isTeamExist){
-        throw new apiError(400,"Team not exist")
+    const isTeamExist = await TeamModel.findById(data.team);
+    if (!isTeamExist) {
+      throw new apiError(400, "Team not exist");
     }
     if (data) {
       const playerModel = new PlayerModel({
@@ -118,9 +120,26 @@ const handleAutoAddPlayerToTeam = asyncHandler(
   }
 );
 
+// handle ball
+const handleBall = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const { data }: { data: IDataBall } = req.body;
+
+    const ballModel = new BallModel({
+      ...data,
+    });
+    const responseBall=await ballModel.save();
+    const m = await updateMatchDetails(responseBall.match.toString());
+    res
+      .status(201)
+      .json(new apiResponse(200, responseBall, "Ball created successfully"));
+  }
+);
+
 export {
   handleMatchCreation,
   handleTeamCreation,
   handlePlayerCreation,
   handleAutoAddPlayerToTeam,
+  handleBall
 };
