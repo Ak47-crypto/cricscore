@@ -19,13 +19,15 @@ const handleMatchCreation = asyncHandler(
         name: data.name,
         team: data.team,
         innings: data.innings,
+        currentBat:data.currentBat,
+        currentBall:data.currentBall,
         date: data.date,
         venue: data.venue,
       });
-      await matchDetails.save();
+      const responseMatch=await matchDetails.save();
       res
         .status(201)
-        .json(new apiResponse(201, {}, "Match created successfully"));
+        .json(new apiResponse(201, responseMatch, "Match created successfully"));
     } else {
       throw new apiError(400, "Data not provided");
     }
@@ -136,10 +138,27 @@ const handleBall = asyncHandler(
   }
 );
 
+// fetch players
+const handleFetchPlayer = asyncHandler(async(req:Request,res:Response,next:NextFunction):Promise<any>=>{
+  const {data}:{data:IMatch}=req.body
+  console.log(req.body)
+    if (!mongoose.Types.ObjectId.isValid(data._id as string)) {
+      throw new apiError(400, "Invalid match ID");
+    }
+  
+  const responsePlayer = await PlayerModel.find({
+    team:data.currentBat
+  })
+  res
+      .status(200)
+      .json(new apiResponse(200, responsePlayer, "Ball created successfully"));
+})
+
 export {
   handleMatchCreation,
   handleTeamCreation,
   handlePlayerCreation,
   handleAutoAddPlayerToTeam,
-  handleBall
+  handleBall,
+  handleFetchPlayer
 };

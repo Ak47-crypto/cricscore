@@ -1,6 +1,7 @@
 import MatchModel from "../models/match.model";
 import BallModel from "../models/ball.model";
 const updateMatchDetails = async (matchId: string): Promise<number> => {
+    
     const findBall = await BallModel.find({
         match:matchId
     })
