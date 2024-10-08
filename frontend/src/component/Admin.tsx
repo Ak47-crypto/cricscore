@@ -2,19 +2,16 @@ import React, { useEffect, useState } from "react";
 import CommentaryButtons from "./CommentryButton";
 import TeamScorecard from "./TeamScorecard";
 import PlayerScorecard from "./PlayerScorecard";
-import {  IApiResponsePlayer, IPlayer } from "../Types/DataTypes";
+import {  IApiResponsePlayer, IMatch, IPlayer } from "../Types/DataTypes";
 
 const App: React.FC = () => {
-    const [players,setPlayers]=useState<IPlayer[]>([])
-//   const players = [
-//     { id: "1", name: "Sachin Tendulkar" },
-//     { id: "2", name: "Rahul Dravid" },
-//     { id: "3", name: "Virat Kohli" },
-//     { id: "4", name: "Rohit Sharma" },
-//   ];
+    const [players,setPlayers]=useState<IApiResponsePlayer>()
+    const [matchData,setMatchData]=useState<IMatch>()
+
   useEffect(() => {
     const MatchId = localStorage.getItem('matchId');
     const parseMatchId = JSON.parse(MatchId as string)
+    setMatchData(parseMatchId)
     console.log(parseMatchId)
     const FetchPlayers=async()=>{
         const response = await fetch("http://localhost:3000/api/fetchPlayer", {
@@ -31,7 +28,7 @@ const App: React.FC = () => {
           
         const data:IApiResponsePlayer = await response.json();
         if(data.statusCode===200){
-            setPlayers(data.data)
+            setPlayers(data)
         }
         console.log(data);
         
@@ -41,11 +38,11 @@ const App: React.FC = () => {
   return localStorage.getItem("matchId") ? (
     <div className="container mx-auto p-4 grid grid-cols-2 gap-4">
       {/* Commentary Buttons Section */}
-      <CommentaryButtons players={players} />
+      <CommentaryButtons data={players?.data} matchData={matchData} />
 
       {/* Scorecards Section */}
       <div className="grid grid-rows-2 gap-4">
-        <TeamScorecard />
+        <TeamScorecard matchDetail={matchData}/>
         <PlayerScorecard />
       </div>
     </div>

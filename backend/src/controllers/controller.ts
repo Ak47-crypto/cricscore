@@ -146,12 +146,19 @@ const handleFetchPlayer = asyncHandler(async(req:Request,res:Response,next:NextF
       throw new apiError(400, "Invalid match ID");
     }
   
-  const responsePlayer = await PlayerModel.find({
+  const responsePlayerBat = await PlayerModel.find({
     team:data.currentBat
   })
+  const responsePlayerBall = await PlayerModel.find({
+    team:data.currentBall
+  })
+  const responseSend={
+    currentBat:responsePlayerBat,
+    currentBall:responsePlayerBall
+  }
   res
       .status(200)
-      .json(new apiResponse(200, responsePlayer, "Ball created successfully"));
+      .json(new apiResponse(200, responseSend, "Ball created successfully"));
 })
 
 export {
