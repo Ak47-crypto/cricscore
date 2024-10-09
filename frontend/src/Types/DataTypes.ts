@@ -30,23 +30,17 @@ export interface IMatch {
   result: string;
 }
 interface IExtra {
-  extras:{
+  
     wide: boolean;
     noBall: boolean;
     byes: boolean;
     legByes: boolean;
     overthrow: boolean;
-}
+
 }
 export interface IBall {
   runs:number;
-  extras:{
-      wide: boolean;
-      noBall: boolean;
-      byes: boolean;
-      legByes: boolean;
-      overthrow: boolean;
-  }
+  extras:IExtra
   isLegal:boolean;
   wicket:boolean;
   batsman:string;

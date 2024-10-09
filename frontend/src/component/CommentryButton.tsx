@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IBall, IMatch, IPlayer } from "../Types/DataTypes";
+import { useAppContext } from "../context/SiteContext";
 
 interface CommentaryButtonsProps {
   data: { currentBat: IPlayer[]; currentBall: IPlayer[] } | undefined;
@@ -20,7 +21,9 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
   const [striker, setStriker] = useState<string>("");
   const [nonStriker, setNonStriker] = useState<string>("");
   const [bowler, setBowler] = useState<string>("");
-
+  const [buttonClick, setButtonClick] = useState<boolean>(false);
+  console.log(matchData);
+  const {setMatchContextData}=useAppContext()
   const [ballData, setBallData] = useState<IBall>({
     runs: 0,
     extras: {
@@ -34,10 +37,11 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
     wicket: false,
     batsman: striker,
     bowler: bowler,
-    match: matchData?._id ? matchData._id : "",
+    match: matchData ? matchData._id : "",
   });
 
   const handleClickRun = (run: number) => {
+    setButtonClick(true);
     setBallData((prev) => ({
       ...prev,
       runs: run,
@@ -51,10 +55,12 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       isLegal: true,
       batsman: striker,
       bowler: bowler,
+      match: matchData ? matchData._id : "",
     }));
   };
 
   const handleExtraClick = (extra: keyof IExtra) => {
+    setButtonClick(true);
     setBallData((prev) => ({
       ...prev,
       extras: {
@@ -62,14 +68,16 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
         [extra]: !prev.extras[extra],
       },
       isLegal: extra === "wide" || extra === "noBall" ? false : true,
-      runs:extra === "wide" || extra === "noBall" ? 1 : 0,
+      runs: extra === "wide" || extra === "noBall" ? 1 : 0,
       batsman: striker,
       bowler: bowler,
+      match: matchData ? matchData._id : "",
     }));
     console.log(ballData);
   };
 
   const handleWicketClick = () => {
+    setButtonClick(true);
     setBallData((prev) => ({
       ...prev,
       wicket: true,
@@ -83,11 +91,65 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       isLegal: true,
       batsman: striker,
       bowler: bowler,
+      match: matchData ? matchData._id : "",
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonClick(false);
+    try {
+      const response = await fetch("http://localhost:3000/api/createBall", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: {
+            ...ballData,
+          },
+        }),
+      });
+      const data = await response.json();
+      if (data.statusCode === 200) {
+        const response2 = await fetch("http://localhost:3000/api/fetchMatch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: {
+              matchId:matchData?._id,
+            },
+          }),
+        });
+        const data2 = await response2.json();
+        if(data2.statusCode ===200){
+          const parsedData = JSON.stringify(data2.data)
+          console.log(parsedData,"in comm");
+          setMatchContextData(data2.data)
+          localStorage.setItem('matchId',parsedData)
+
+        }
+        setBallData({
+          runs: 0,
+          extras: {
+            wide: false,
+            noBall: false,
+            byes: false,
+            legByes: false,
+            overthrow: false,
+          },
+          isLegal: true,
+          wicket: false,
+          batsman: striker,
+          bowler: bowler,
+          match: matchData ? matchData._id : "",
+        });
+        alert("Successfully saved");
+      }
+      console.log(data);
+    } catch (error) {}
   };
   return (
     <div className="space-y-4">
@@ -158,11 +220,18 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
               type="button"
               className="border p-4"
               onClick={() => handleClickRun(run)}
+              disabled={buttonClick}
             >
               {run}
             </button>
           ))}
-          <button className="border p-4">Wicket</button>
+          <button
+            className="border p-4"
+            onClick={handleWicketClick}
+            disabled={buttonClick}
+          >
+            Wicket
+          </button>
         </div>
 
         {/* Extras */}
@@ -170,24 +239,28 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
           <button
             className="border p-4"
             onClick={() => handleExtraClick("wide")}
+            disabled={buttonClick}
           >
             Wide
           </button>
           <button
             className="border p-4"
             onClick={() => handleExtraClick("noBall")}
+            disabled={buttonClick}
           >
             Noball
           </button>
           <button
             className="border p-4"
             onClick={() => handleExtraClick("byes")}
+            disabled={buttonClick}
           >
             Bye
           </button>
           <button
             className="border p-4"
             onClick={() => handleExtraClick("legByes")}
+            disabled={buttonClick}
           >
             Legbye
           </button>

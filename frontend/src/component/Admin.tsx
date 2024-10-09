@@ -12,7 +12,6 @@ const App: React.FC = () => {
     const MatchId = localStorage.getItem('matchId');
     const parseMatchId = JSON.parse(MatchId as string)
     setMatchData(parseMatchId)
-    console.log(parseMatchId)
     const FetchPlayers=async()=>{
         const response = await fetch("http://localhost:3000/api/fetchPlayer", {
             method: "POST",

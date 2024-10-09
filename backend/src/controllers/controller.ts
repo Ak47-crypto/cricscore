@@ -161,11 +161,24 @@ const handleFetchPlayer = asyncHandler(async(req:Request,res:Response,next:NextF
       .json(new apiResponse(200, responseSend, "Ball created successfully"));
 })
 
+const handleFetchMatch = asyncHandler(async(req:Request,res:Response,next:NextFunction):Promise<any> =>{
+  const {data} = req.body;
+  if (!mongoose.Types.ObjectId.isValid(data.matchId as string)) {
+    throw new apiError(400, "Invalid match ID");
+  }
+  const responseMatch = await MatchModel.findById(data.matchId)
+  if(responseMatch)
+  res
+      .status(200)
+      .json(new apiResponse(200, responseMatch, "Ball created successfully"));
+})
+
 export {
   handleMatchCreation,
   handleTeamCreation,
   handlePlayerCreation,
   handleAutoAddPlayerToTeam,
   handleBall,
-  handleFetchPlayer
+  handleFetchPlayer,
+  handleFetchMatch
 };
