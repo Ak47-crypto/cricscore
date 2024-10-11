@@ -45,7 +45,7 @@ const App: React.FC = () => {
       </div>
     </div>
   ) : (
-    <h1>no match id provided</h1>
+    <h1>no match id provided.... please reload the page</h1>
   );
 };
 
