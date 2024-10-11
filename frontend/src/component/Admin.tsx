@@ -12,24 +12,26 @@ const App: React.FC = () => {
     const MatchId = localStorage.getItem('matchId');
     const parseMatchId = JSON.parse(MatchId as string)
     const FetchPlayers=async()=>{
-        const response = await fetch("http://localhost:3000/api/fetchPlayer", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+      try {
+        const response = await fetch("https://cricscore-eosin.vercel.app/api/fetchPlayer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: {
+              ...parseMatchId,
             },
-            body: JSON.stringify({
-              data: {
-                ...parseMatchId,
-              },
-            }),
-          });
-          
-        const data:IApiResponsePlayer = await response.json();
-        if(data.statusCode===200){
-            setPlayers(data)
-        }
-        console.log(data);
+          }),
+        });
         
+      const data:IApiResponsePlayer = await response.json();
+      if(data.statusCode===200){
+          setPlayers(data)
+      }
+      } catch (error) {
+        console.log(error)
+      }
     }
      FetchPlayers();
   }, []);

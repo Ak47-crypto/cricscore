@@ -33,7 +33,7 @@ export const MyProvider=({children}:{children:React.ReactNode}) => {
       setMatchContextData(JSON.parse(localStorage.getItem('matchId') as string))
     }
     else{
-      fetch('http://localhost:3000/api/fetchMatch',{
+      fetch('https://cricscore-eosin.vercel.app/api/fetchMatch',{
         method:"POST",
         headers:{
           "Content-Type":"application/json"

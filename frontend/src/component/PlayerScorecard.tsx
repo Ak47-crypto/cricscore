@@ -23,7 +23,8 @@ const PlayerScorecard: React.FC = () => {
 useEffect(()=>{
   const FetchBatsmanStats = async ()=>{
     // bowler
-    const response2 = await fetch("http://localhost:3000/api/fetchPlayerRun", {
+   try {
+    const response2 = await fetch("https://cricscore-eosin.vercel.app/api/fetchPlayerRun", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,6 +40,9 @@ useEffect(()=>{
     if(data2.statusCode===200){
      setBowlerStat(data2.data)
     }
+   } catch (error) {
+    console.log(error)
+   }
   }
   FetchBatsmanStats()
 },[bowlerContext,matchState])
@@ -46,7 +50,8 @@ useEffect(()=>{
   useEffect(()=>{
     const FetchBatsmanStats = async ()=>{
       // nonStriekr
-      const response2 = await fetch("http://localhost:3000/api/fetchPlayerRun", {
+     try {
+      const response2 = await fetch("https://cricscore-eosin.vercel.app/api/fetchPlayerRun", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,6 +72,10 @@ useEffect(()=>{
           }
         }))
       }
+     } catch (error) {
+      console.log(error);
+      
+     }
     }
     FetchBatsmanStats()
   },[nonStrikerContext,matchState])
@@ -75,7 +84,8 @@ useEffect(()=>{
     console.log(strikerContext);
     
     const FetchBatsmanStats = async () =>{
-      const response = await fetch("http://localhost:3000/api/fetchPlayerRun", {
+     try {
+      const response = await fetch("https://cricscore-eosin.vercel.app/api/fetchPlayerRun", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +106,10 @@ useEffect(()=>{
           }
         }))
       }
+     } catch (error) {
+      console.log(error);
       
+     }
     }
     FetchBatsmanStats();
   },[strikerContext,matchState])

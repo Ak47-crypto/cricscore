@@ -20,6 +20,8 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
   const [nonStriker, setNonStriker] = useState<string>("");
   const [bowler, setBowler] = useState<string>("");
   const [buttonClick, setButtonClick] = useState<boolean>(false);
+  const [submitButtonClick, setSubmitButtonClick] = useState<boolean>(false);
+
   const {matchContextData,setMatchContextData,setStrikerContext,setNonStrikerContext,setBowlerContext,setMatchState}=useAppContext()
   const [ballData, setBallData] = useState<IBall>({
     runs: 0,
@@ -94,9 +96,9 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setButtonClick(false);
+    setSubmitButtonClick(true);
     try {
-      const response = await fetch("http://localhost:3000/api/createBall", {
+      const response = await fetch("https://cricscore-eosin.vercel.app/api/createBall", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +111,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       });
       const data = await response.json();
       if (data.statusCode === 200) {
-        const response2 = await fetch("http://localhost:3000/api/fetchMatch", {
+        const response2 = await fetch("https://cricscore-eosin.vercel.app/api/fetchMatch", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -147,7 +149,13 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
         alert("Successfully saved");
       }
       console.log(data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
+    finally{
+      setButtonClick(false);
+      setSubmitButtonClick(false)
+    }
   };
   return (
     <div className="space-y-4">
@@ -264,7 +272,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
             Legbye
           </button>
         </div>
-        <button className="border p-4 text-center w-full mt-2" type="submit">
+        <button className="border p-4 text-center w-full mt-2" type="submit" disabled={submitButtonClick}>
           Submit
         </button>
       </form>
