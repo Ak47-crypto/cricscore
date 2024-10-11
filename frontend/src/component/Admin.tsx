@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import CommentaryButtons from "./CommentryButton";
 import TeamScorecard from "./TeamScorecard";
 import PlayerScorecard from "./PlayerScorecard";
-import {  IApiResponsePlayer, IMatch, IPlayer } from "../Types/DataTypes";
-import { useAppContext } from "../context/SiteContext";
+import {  IApiResponsePlayer } from "../Types/DataTypes";
 
 const App: React.FC = () => {
     const [players,setPlayers]=useState<IApiResponsePlayer>()
-    const {matchContextData}=useAppContext();
   useEffect(() => {
     const MatchId = localStorage.getItem('matchId');
     const parseMatchId = JSON.parse(MatchId as string)

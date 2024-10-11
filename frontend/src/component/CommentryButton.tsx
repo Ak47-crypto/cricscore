@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { IBall, IMatch, IPlayer } from "../Types/DataTypes";
+import React, {   useState } from "react";
+import { IBall, IPlayer } from "../Types/DataTypes";
 import { useAppContext } from "../context/SiteContext";
 
 interface CommentaryButtonsProps {
@@ -96,6 +96,8 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(nonStriker);
+    
     setSubmitButtonClick(true);
     try {
       const response = await fetch("https://cricscore-eosin.vercel.app/api/createBall", {
