@@ -4,7 +4,6 @@ import { useAppContext } from "../context/SiteContext";
 
 interface CommentaryButtonsProps {
   data: { currentBat: IPlayer[]; currentBall: IPlayer[] } | undefined;
-  matchData: IMatch | undefined;
 }
 interface IExtra {
   wide: boolean;
@@ -15,15 +14,13 @@ interface IExtra {
 }
 
 const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
-  data,
-  matchData,
+  data
 }) => {
   const [striker, setStriker] = useState<string>("");
   const [nonStriker, setNonStriker] = useState<string>("");
   const [bowler, setBowler] = useState<string>("");
   const [buttonClick, setButtonClick] = useState<boolean>(false);
-  console.log(matchData);
-  const {setMatchContextData}=useAppContext()
+  const {matchContextData,setMatchContextData,setStrikerContext,setNonStrikerContext,setBowlerContext,setMatchState}=useAppContext()
   const [ballData, setBallData] = useState<IBall>({
     runs: 0,
     extras: {
@@ -37,7 +34,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
     wicket: false,
     batsman: striker,
     bowler: bowler,
-    match: matchData ? matchData._id : "",
+    match: matchContextData ? matchContextData._id : "",
   });
 
   const handleClickRun = (run: number) => {
@@ -55,7 +52,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       isLegal: true,
       batsman: striker,
       bowler: bowler,
-      match: matchData ? matchData._id : "",
+      match: matchContextData ? matchContextData._id : "",
     }));
   };
 
@@ -71,7 +68,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       runs: extra === "wide" || extra === "noBall" ? 1 : 0,
       batsman: striker,
       bowler: bowler,
-      match: matchData ? matchData._id : "",
+      match: matchContextData ? matchContextData._id : "",
     }));
     console.log(ballData);
   };
@@ -91,7 +88,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
       isLegal: true,
       batsman: striker,
       bowler: bowler,
-      match: matchData ? matchData._id : "",
+      match: matchContextData ? matchContextData._id : "",
     }));
   };
 
@@ -119,7 +116,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
           },
           body: JSON.stringify({
             data: {
-              matchId:matchData?._id,
+              matchId:matchContextData?._id,
             },
           }),
         });
@@ -128,6 +125,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
           const parsedData = JSON.stringify(data2.data)
           console.log(parsedData,"in comm");
           setMatchContextData(data2.data)
+          setMatchState((prev: number) => prev + 1);
           localStorage.setItem('matchId',parsedData)
 
         }
@@ -144,7 +142,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
           wicket: false,
           batsman: striker,
           bowler: bowler,
-          match: matchData ? matchData._id : "",
+          match: matchContextData ? matchContextData._id : "",
         });
         alert("Successfully saved");
       }
@@ -163,7 +161,8 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
             id="striker"
             className="border p-2 w-full"
             name="striker"
-            onChange={(e) => setStriker(e.target.value)}
+            onChange={(e) => {setStriker(e.target.value); setStrikerContext(e.target.value)}}
+            
           >
             <option value="">Select Striker</option>
             {data?.currentBat.map((player) => (
@@ -181,7 +180,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
             id="nonStriker"
             className="border p-2 w-full"
             name="nonStriker"
-            onChange={(e) => setNonStriker(e.target.value)}
+            onChange={(e) => {setNonStriker(e.target.value); setNonStrikerContext(e.target.value)}}
           >
             <option value="">Select Non-Striker</option>
             {data?.currentBat.map((player) => (
@@ -199,7 +198,7 @@ const CommentaryButtons: React.FC<CommentaryButtonsProps> = ({
             id="nonStriker"
             className="border p-2 w-full"
             name="nonStriker"
-            onChange={(e) => setBowler(e.target.value)}
+            onChange={(e) => {setBowler(e.target.value); setBowlerContext(e.target.value)}}
           >
             <option value="">Select Bowler</option>
             {data?.currentBall.map((player) => (

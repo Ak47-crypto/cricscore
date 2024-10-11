@@ -19,15 +19,17 @@ const handleMatchCreation = asyncHandler(
         name: data.name,
         team: data.team,
         innings: data.innings,
-        currentBat:data.currentBat,
-        currentBall:data.currentBall,
+        currentBat: data.currentBat,
+        currentBall: data.currentBall,
         date: data.date,
         venue: data.venue,
       });
-      const responseMatch=await matchDetails.save();
+      const responseMatch = await matchDetails.save();
       res
         .status(201)
-        .json(new apiResponse(201, responseMatch, "Match created successfully"));
+        .json(
+          new apiResponse(201, responseMatch, "Match created successfully")
+        );
     } else {
       throw new apiError(400, "Data not provided");
     }
@@ -130,7 +132,7 @@ const handleBall = asyncHandler(
     const ballModel = new BallModel({
       ...data,
     });
-    const responseBall=await ballModel.save();
+    const responseBall = await ballModel.save();
     const m = await updateMatchDetails(responseBall.match.toString());
     res
       .status(201)
@@ -139,39 +141,72 @@ const handleBall = asyncHandler(
 );
 
 // fetch players
-const handleFetchPlayer = asyncHandler(async(req:Request,res:Response,next:NextFunction):Promise<any>=>{
-  const {data}:{data:IMatch}=req.body
-  console.log(req.body)
+const handleFetchPlayer = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const { data }: { data: IMatch } = req.body;
+    console.log(req.body);
     if (!mongoose.Types.ObjectId.isValid(data._id as string)) {
       throw new apiError(400, "Invalid match ID");
     }
-  
-  const responsePlayerBat = await PlayerModel.find({
-    team:data.currentBat
-  })
-  const responsePlayerBall = await PlayerModel.find({
-    team:data.currentBall
-  })
-  const responseSend={
-    currentBat:responsePlayerBat,
-    currentBall:responsePlayerBall
-  }
-  res
+
+    const responsePlayerBat = await PlayerModel.find({
+      team: data.currentBat,
+    });
+    const responsePlayerBall = await PlayerModel.find({
+      team: data.currentBall,
+    });
+    const responseSend = {
+      currentBat: responsePlayerBat,
+      currentBall: responsePlayerBall,
+    };
+    res
       .status(200)
       .json(new apiResponse(200, responseSend, "Ball created successfully"));
-})
-
-const handleFetchMatch = asyncHandler(async(req:Request,res:Response,next:NextFunction):Promise<any> =>{
-  const {data} = req.body;
-  if (!mongoose.Types.ObjectId.isValid(data.matchId as string)) {
-    throw new apiError(400, "Invalid match ID");
   }
-  const responseMatch = await MatchModel.findById(data.matchId)
-  if(responseMatch)
-  res
+);
+
+const handleFetchMatch = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const { data } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(data.matchId as string)) {
+      throw new apiError(400, "Invalid match ID");
+    }
+    const responseMatch = await MatchModel.findById(data.matchId);
+    if (responseMatch)
+      res
+        .status(200)
+        .json(new apiResponse(200, responseMatch, "Ball created successfully"));
+  }
+);
+
+const handleFetchPlayerRuns = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const { data } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(data.playerId as string)) {
+      throw new apiError(400, "Invalid player ID");
+    }
+    if (data.playerType === "batsman") {
+      const responsePlayer = await BallModel.find({
+        isLegal: true,
+        batsman: data.playerId,
+      });
+      let runs = 0;
+        responsePlayer?.map((ball)=>runs+=ball.runs)
+      res
       .status(200)
-      .json(new apiResponse(200, responseMatch, "Ball created successfully"));
-})
+      .json(new apiResponse(200, {runs}, "Fetched batsman run successfully"));
+    }
+    // bowler
+    const responsePlayer = await BallModel.find({
+      bowler: data.playerId,
+    });
+    let wickets = responsePlayer?.filter((ball)=>ball.wicket!=false).length
+        
+    res
+    .status(200)
+    .json(new apiResponse(200, {wickets}, "Fetched bowler wickets successfully"));
+  }
+);
 
 export {
   handleMatchCreation,
@@ -180,5 +215,6 @@ export {
   handleAutoAddPlayerToTeam,
   handleBall,
   handleFetchPlayer,
-  handleFetchMatch
+  handleFetchMatch,
+  handleFetchPlayerRuns
 };

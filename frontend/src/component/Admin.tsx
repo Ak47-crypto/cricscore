@@ -3,15 +3,14 @@ import CommentaryButtons from "./CommentryButton";
 import TeamScorecard from "./TeamScorecard";
 import PlayerScorecard from "./PlayerScorecard";
 import {  IApiResponsePlayer, IMatch, IPlayer } from "../Types/DataTypes";
+import { useAppContext } from "../context/SiteContext";
 
 const App: React.FC = () => {
     const [players,setPlayers]=useState<IApiResponsePlayer>()
-    const [matchData,setMatchData]=useState<IMatch>()
-
+    const {matchContextData}=useAppContext();
   useEffect(() => {
     const MatchId = localStorage.getItem('matchId');
     const parseMatchId = JSON.parse(MatchId as string)
-    setMatchData(parseMatchId)
     const FetchPlayers=async()=>{
         const response = await fetch("http://localhost:3000/api/fetchPlayer", {
             method: "POST",
@@ -37,11 +36,11 @@ const App: React.FC = () => {
   return localStorage.getItem("matchId") ? (
     <div className="container mx-auto p-4 grid grid-cols-2 gap-4">
       {/* Commentary Buttons Section */}
-      <CommentaryButtons data={players?.data} matchData={matchData} />
+      <CommentaryButtons data={players?.data} />
 
       {/* Scorecards Section */}
       <div className="grid grid-rows-2 gap-4">
-        <TeamScorecard matchDetail={matchData}/>
+        <TeamScorecard/>
         <PlayerScorecard />
       </div>
     </div>
